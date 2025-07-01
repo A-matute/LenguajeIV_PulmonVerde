@@ -9,33 +9,31 @@ const db = require('../config/db-connection');
 
 // Definimos una ruta GET para obtener todos los registros de las personas.
 router.get('/personas', (req, res) => {
-    // Definimos las columnas que queremos traer de la tabla
-    // Estas son las columnas de la tabla personas
+    // Definimos las columnas que queremos traer de la tabla.
+    // Estas columnas se usarán en el SELECT dinámico del procedimiento almacenado.
     const columnas = 'cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad';
 
-    // Definimos el nombre de la tabla
+    // Definimos el nombre de la tabla.
     const tabla = 'personas';
 
-     // Construimos un query SQL completo en forma de texto
-    // Ejemplo:
-    // SELECT cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad FROM personas
-    const querySQL = `SELECT ${columnas} FROM ${tabla}`;
-
-    // Llamamos al procedimiento almacenado SEL_PERSONAS en MySQL
-    // Le pasamos un solo parámetro: el query SQL completo (querySQL)
-    db.query('CALL SEL_PERSONAS(?)', [querySQL], (err, results) => {
-        // Si hubo error al ejecutar el procedimiento
+    // Llamamos al procedimiento almacenado PA_SELECT en MySQL.
+    // IMPORTANTE: El orden de los parámetros es:
+    //   1. nombre de la tabla
+    //   2. lista de columnas
+    //
+    // Si los envías al revés, MySQL tratará las columnas como nombre de tabla y fallará.
+    db.query('CALL PA_SELECT(?, ?)', [tabla, columnas], (err, results) => {
         if (err) {
-            // Imprimimos el error en consola para depuración
-            console.error('Ocurrio un error en el procedimiento almacenado:', err.sqlMessage || err.message || err);
-             // Respondemos al cliente con un JSON que indica error
+            // Si ocurre un error en el SP, lo mostramos en consola
+            // y respondemos con un error 500 (error del servidor).
+            console.error('Ocurrió un error en el procedimiento almacenado:', err.sqlMessage || err.message || err);
             res.status(500).json({
                 error: true,
                 respuesta: err.sqlMessage || err.message
             });
         } else {
-             // Si no hubo error, devolvemos el resultado
-            // results es un arreglo de arreglos porque CALL siempre devuelve arrays
+            // Si no hay error, devolvemos los resultados en formato JSON.
+            // results[0] contiene las filas devueltas por el SELECT dinámico.
             res.status(200).json(results[0]);
         }
     });
