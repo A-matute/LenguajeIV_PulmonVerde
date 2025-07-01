@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 // Importamos la conexión a la base de datos (desde models/personas-model.js)
-const db = require('../models/usuarios_personas-model');
+const db = require('../models/db-connection');
 
 // Definimos una ruta GET para obtener todos los registros de las personas.
 router.get('/personas', (req, res) => {
