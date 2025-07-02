@@ -6,7 +6,7 @@ const router = express.Router();
 // Importamos la conexión a la base de datos (desde models/personas-model.js)
 const db = require('../config/db-connection');
 
-// Definimos una ruta GET para obtener todos los registros de las cabanas.
+// Definimos una ruta GET para obtener todos los registros de los clientes.
 router.get('/clientes', (req, res) => {
     // Definimos las columnas que queremos traer de la tabla.
     // Estas columnas se usarán en el SELECT dinámico del procedimiento almacenado.
@@ -39,24 +39,22 @@ router.get('/clientes', (req, res) => {
 });
 
 // Ruta POST para insertar una nueva persona.
-router.post('/cabanas', (req, res) => {
+router.post('/clientes', (req, res) => {
     // Extraer cod_cabana y los demás campos del body
     const {
-        cod_cabana,
-        tipo_cabana,
-        ubicacion,
-        cant_personas,
-        precio,
-        cod_espacio
+        cod_cliente,
+        fecha_hora_ingreso,
+        cod_persona,
+        cod_usuario
     } = req.body;
 
-    const tabla = 'cabanas';
+    const tabla = 'clientes';
 
     // Armamos la lista de columnas
-    const columnas = 'cod_cabana, tipo_cabana, ubicacion, cant_personas, precio, cod_espacio';
+    const columnas = 'cod_cliente, fecha_hora_ingreso, cod_persona, cod_usuario';
 
     // Armamos los valores, con cod_cabana sin comillas (porque es número)
-    const datos = `${cod_cabana}, '${tipo_cabana}', '${ubicacion}', '${cant_personas}', '${precio}', '${cod_espacio}'`;
+    const datos = `${cod_cliente}, '${fecha_hora_ingreso}', ${cod_persona}, ${cod_usuario}`;
 
     // Llamamos al procedimiento almacenado
     db.query('CALL PA_INSERT(?, ?, ?)', [tabla, columnas, datos], (err, results) => {
@@ -75,7 +73,7 @@ router.post('/cabanas', (req, res) => {
 });
 
 // Definimos la ruta PUT para actualizar registro en la tabla personas.
-router.put('/cabanas', (req, res) => {
+router.put('/clientes', (req, res) => {
 
     // Extraemos datos del body JSON que nos envía el cliente (Postman, frontend, etc.)
     // Usamos destructuring para sacar directamente las variables del objeto JSON.
@@ -101,7 +99,7 @@ router.put('/cabanas', (req, res) => {
     }
 
     // Nombre de la tabla en la base de datos
-    const tabla = 'cabanas';
+    const tabla = 'clientes';
 
     // Armamos el valor que queremos asignar en el UPDATE.
     // Si es número, lo dejamos sin comillas (ej: 25)
