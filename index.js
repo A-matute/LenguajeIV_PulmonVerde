@@ -14,6 +14,7 @@ app.use(bp.json());
 const routerPersonas = require('./routers/personas');
 const routerCabana = require('./routers/cabanas');
 const routerClientes = require('./routers/clientes');
+const routerCorreos = require('./routers/correos');
 
 
 
@@ -21,6 +22,7 @@ const routerClientes = require('./routers/clientes');
 app.use(routerPersonas);
 app.use(routerCabana);
 app.use(routerClientes);
+app.use(routerCorreos);
 
 //Le dice a Express: Cada vez que recibas datos en JSON en el body de la petición, conviértelos automáticamente en un objeto de JavaScript para poder trabajarlos.
 app.use(express.json());
