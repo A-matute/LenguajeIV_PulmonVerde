@@ -4,7 +4,7 @@ const express = require('express');
 // Creamos un router independiente de Express
 const router = express.Router();
 
-// Importamos la conexión a la base de datos (desde models/personas-model.js)
+// Importamos la conexión a la base de datos (desde config/db-connection.js)
 const db = require('../config/db-connection');
 
 
@@ -136,6 +136,9 @@ router.put('/archivos', (req, res) => {
         }
     );
 });
+
+
+
 
 
 

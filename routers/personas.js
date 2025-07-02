@@ -4,8 +4,10 @@ const express = require('express');
 // Creamos un router independiente de Express
 const router = express.Router();
 
-// Importamos la conexión a la base de datos (desde models/personas-model.js)
+// Importamos la conexión a la base de datos (desde config/db-connection.js)
 const db = require('../config/db-connection');
+
+
 
 // Definimos una ruta GET para obtener todos los registros de las personas.
 router.get('/personas', (req, res) => {
@@ -21,7 +23,7 @@ router.get('/personas', (req, res) => {
     //   1. nombre de la tabla
     //   2. lista de columnas
     //
-    // Si los envías al revés, MySQL tratará las columnas como nombre de tabla y fallará.
+    // Si los envío al revés, MySQL tratará las columnas como nombre de tabla y fallará.
     db.query('CALL PA_SELECT(?, ?)', [tabla, columnas], (err, results) => {
         if (err) {
             // Si ocurre un error en el SP, lo mostramos en consola
@@ -100,7 +102,7 @@ router.put('/personas', (req, res) => {
     ) {
         return res.status(400).json({
             error: true,
-            message: 'Faltan campos obligatorios en el JSON enviado.'
+            respuesta: 'Faltan campos obligatorios en el JSON enviado.'
         });
     }
 
@@ -140,7 +142,7 @@ router.put('/personas', (req, res) => {
             if (err) {
                 // Si ocurre un error en la ejecución del procedimiento almacenado,
                 // lo mostramos en consola y devolvemos un error 500 al cliente.
-                console.error('❌ Error en el procedimiento almacenado UPDATE:', err.sqlMessage || err.message || err);
+                console.error('Error en el procedimiento almacenado UPDATE:', err.sqlMessage || err.message || err);
                 res.status(500).json({
                     error: true,
                     respuesta: err.sqlMessage || err.message
@@ -148,7 +150,7 @@ router.put('/personas', (req, res) => {
             } else {
                 // Si todo salió bien, devolvemos un mensaje de éxito.
                 res.status(200).json({
-                    respuesta: 'Registro actualizado correctamente.'
+                    respuesta: 'Registro actualizado correctamente en sistema.'
                 });
             }
         }

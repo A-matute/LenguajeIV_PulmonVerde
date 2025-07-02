@@ -9,8 +9,8 @@ const bp = require('body-parser');
 //Enviando los datos JSON a NodeJS API
 app.use(bp.json());
 
-//Importa el archivo que cree llamado router.js
-//Este archivo contiene todas tus rutas definidas con Express.
+//Importa los archivos que cree llamado router.js
+//Estos archivos contienen todas las rutas definidas con Express.
 const routerPersonas = require('./routers/personas');
 const routerActividades = require('./routers/actividades');
 const routerArchivos = require('./routers/archivos');
@@ -29,7 +29,7 @@ const routerBackups = require('./routers/backups');
 
 
 
-//Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con /.
+//Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con ./
 app.use(routerPersonas);
 app.use(routerActividades);
 app.use(routerArchivos);
