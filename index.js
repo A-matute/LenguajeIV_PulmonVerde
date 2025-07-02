@@ -13,6 +13,7 @@ app.use(bp.json());
 //Este archivo contiene todas tus rutas definidas con Express.
 const routerPersonas = require('./routers/personas');
 const routerActividades = require('./routers/actividades');
+const routerArchivos = require('./routers/archivos');
 
 
 
@@ -29,6 +30,7 @@ const routerActividades = require('./routers/actividades');
 //Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con /.
 app.use(routerPersonas);
 app.use(routerActividades);
+app.use(routerArchivos);
 
 //Le dice a Express: Cada vez que recibas datos en JSON en el body de la petición, conviértelos automáticamente en un objeto de JavaScript para poder trabajarlos.
 app.use(express.json());
