@@ -11,27 +11,16 @@ app.use(bp.json());
 
 //Importa el archivo que cree llamado router.js
 //Este archivo contiene todas tus rutas definidas con Express.
-const router = require('./routers/personas');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const routerPersonas = require('./routers/personas');
+const routerCabana = require('./routers/cabanas');
+const routerClientes = require('./routers/clientes');
 
 
 
 //Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con /.
-app.use('/', router);
+app.use(routerPersonas);
+app.use(routerCabana);
+app.use(routerClientes);
 
 //Le dice a Express: Cada vez que recibas datos en JSON en el body de la petición, conviértelos automáticamente en un objeto de JavaScript para poder trabajarlos.
 app.use(express.json());
