@@ -13,14 +13,11 @@ app.use(bp.json());
 //Este archivo contiene todas tus rutas definidas con Express.
 const routerPersona = require('./routers/personas');
 const routerParques = require('./routers/parques');
-const routerEmpleados = require('./routers/empleados');
-const routerEspacios = require('./routers/espacios');
-const routerEventosAmbientales = require('./routers/eventos_ambientales');
-const routerLogLogins = require('./routers/log_logins');
-const routerMantenimientos = require('./routers/mantenimientos');
-const routerPantallas = require('./routers/pantallas');
-
-
+const routerReservas = require('./routers/reservas');
+const routerPermisos = require('./routers/permisos');
+const routerRoles_pantallas_permisos = require('./routers/roles_pantallas_permisos');
+const routerRoles = require('./routers/roles');
+const routerTelefonos = require('./routers/telefonos');
 
 
 
@@ -28,12 +25,12 @@ const routerPantallas = require('./routers/pantallas');
 //Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con /.
 app.use(routerPersona);
 app.use(routerParques);
-app.use(routerEmpleados);
-app.use(routerEspacios);
-app.use(routerEventosAmbientales);
-app.use(routerLogLogins);
-app.use(routerMantenimientos);
-app.use(routerPantallas);
+app.use(routerReservas);
+app.use(routerPermisos);
+app.use(routerRoles_pantallas_permisos);
+app.use(routerRoles);
+app.use(routerTelefonos);
+
 
 //Le dice a Express: Cada vez que recibas datos en JSON en el body de la petición, conviértelos automáticamente en un objeto de JavaScript para poder trabajarlos.
 app.use(express.json());
