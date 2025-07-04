@@ -24,7 +24,10 @@ const routerEventosAmbientales = require('./routers/eventos_ambientales');
 const routerLogLogins = require('./routers/log_logins');
 const routerMantenimientos = require('./routers/mantenimientos');
 const routerPantallas = require('./routers/pantallas');
-
+const routerUsuarios = require('./routers/usuarios');
+const routerUsuariosRoles = require('./routers/usuarios_roles');
+const routerAlertas = require('./routers/alertas');
+const routerRecursos = require('./routers/recursos');
 
 
 
@@ -42,7 +45,10 @@ app.use(routerEventosAmbientales);
 app.use(routerLogLogins);
 app.use(routerMantenimientos);
 app.use(routerPantallas);
-
+app.use(routerUsuarios);
+app.use(routerUsuariosRoles);
+app.use(routerAlertas);
+app.use(routerRecursos);
 
 //Le dice a Express: Cada vez que recibas datos en JSON en el body de la petición, conviértelos automáticamente en un objeto de JavaScript para poder trabajarlos.
 app.use(express.json());
