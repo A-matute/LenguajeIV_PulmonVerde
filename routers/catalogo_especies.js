@@ -7,13 +7,13 @@ const router = express.Router();
 const db = require('../config/db-connection');
 
 // Definimos una ruta GET para obtener todos los registros de las cabanas.
-router.get('/direcciones', (req, res) => {
+router.get('/catalogo_especies', (req, res) => {
     // Definimos las columnas que queremos traer de la tabla.
     // Estas columnas se usarán en el SELECT dinámico del procedimiento almacenado.
-    const columnas = 'cod_direccion, detalle_direccion, pais, ciudad, cod_persona, cod_parque';
+    const columnas = 'cod_especie, nombre_especie, cod_tipo_especie';
 
     // Definimos el nombre de la tabla.
-    const tabla = 'direcciones';
+    const tabla = 'catalogo_especies';
 
     // Llamamos al procedimiento almacenado PA_SELECT en MySQL.
     // IMPORTANTE: El orden de los parámetros es:
@@ -39,24 +39,21 @@ router.get('/direcciones', (req, res) => {
 });
 
 // Ruta POST para insertar una nueva persona.
-router.post('/direcciones', (req, res) => {
+router.post('/catalogo_especies', (req, res) => {
     // Extraer cod_cabana y los demás campos del body
     const {
-        cod_direccion,
-        detalle_direccion,
-        pais,
-        ciudad,
-        cod_persona,
-        cod_parque
+        cod_especie,
+        nombre_especie,
+        cod_tipo_especie
     } = req.body;
 
-    const tabla = 'direcciones';
+    const tabla = 'catalogo_especies';
 
     // Armamos la lista de columnas
-    const columnas = 'cod_direccion, detalle_direccion, pais, ciudad, cod_persona, cod_parque';
+    const columnas = 'cod_especie, nombre_especie, cod_tipo_especie';
 
     // Armamos los valores, con cod_cabana sin comillas (porque es número)
-    const datos = `${cod_direccion}, '${detalle_direccion}', '${pais}', '${ciudad}', ${cod_persona}, ${cod_parque}`;
+    const datos = `${cod_especie}, '${nombre_especie}', ${cod_tipo_especie}`;
 
     // Llamamos al procedimiento almacenado
     db.query('CALL PA_INSERT(?, ?, ?)', [tabla, columnas, datos], (err, results) => {
@@ -75,7 +72,7 @@ router.post('/direcciones', (req, res) => {
 });
 
 // Definimos la ruta PUT para actualizar registro en la tabla personas.
-router.put('/direcciones', (req, res) => {
+router.put('/catalogo_especies', (req, res) => {
 
     // Extraemos datos del body JSON que nos envía el cliente (Postman, frontend, etc.)
     // Usamos destructuring para sacar directamente las variables del objeto JSON.
@@ -101,7 +98,7 @@ router.put('/direcciones', (req, res) => {
     }
 
     // Nombre de la tabla en la base de datos
-    const tabla = 'direcciones';
+    const tabla = 'catalogo_especies';
 
     // Armamos el valor que queremos asignar en el UPDATE.
     // Si es número, lo dejamos sin comillas (ej: 25)

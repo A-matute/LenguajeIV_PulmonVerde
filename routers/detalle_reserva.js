@@ -6,14 +6,14 @@ const router = express.Router();
 // Importamos la conexión a la base de datos (desde models/personas-model.js)
 const db = require('../config/db-connection');
 
-// Definimos una ruta GET para obtener todos los registros de las cabanas.
-router.get('/direcciones', (req, res) => {
+// Definimos una ruta GET para obtener todos los registros de los clientes.
+router.get('/detalle_reserva', (req, res) => {
     // Definimos las columnas que queremos traer de la tabla.
     // Estas columnas se usarán en el SELECT dinámico del procedimiento almacenado.
-    const columnas = 'cod_direccion, detalle_direccion, pais, ciudad, cod_persona, cod_parque';
+    const columnas = 'cod_detalle_reserva, cod_cabana, cod_actividad';
 
     // Definimos el nombre de la tabla.
-    const tabla = 'direcciones';
+    const tabla = 'detalle_reserva';
 
     // Llamamos al procedimiento almacenado PA_SELECT en MySQL.
     // IMPORTANTE: El orden de los parámetros es:
@@ -39,24 +39,21 @@ router.get('/direcciones', (req, res) => {
 });
 
 // Ruta POST para insertar una nueva persona.
-router.post('/direcciones', (req, res) => {
+router.post('/detalle_reserva', (req, res) => {
     // Extraer cod_cabana y los demás campos del body
     const {
-        cod_direccion,
-        detalle_direccion,
-        pais,
-        ciudad,
-        cod_persona,
-        cod_parque
+        cod_detalle_reserva,
+        cod_cabana,
+        cod_actividad,
     } = req.body;
 
-    const tabla = 'direcciones';
+    const tabla = 'detalle_reserva';
 
     // Armamos la lista de columnas
-    const columnas = 'cod_direccion, detalle_direccion, pais, ciudad, cod_persona, cod_parque';
+    const columnas = 'cod_detalle_reserva, cod_cabana, cod_actividad';
 
     // Armamos los valores, con cod_cabana sin comillas (porque es número)
-    const datos = `${cod_direccion}, '${detalle_direccion}', '${pais}', '${ciudad}', ${cod_persona}, ${cod_parque}`;
+    const datos = `${cod_detalle_reserva}, ${cod_cabana}, ${cod_actividad}`;
 
     // Llamamos al procedimiento almacenado
     db.query('CALL PA_INSERT(?, ?, ?)', [tabla, columnas, datos], (err, results) => {
@@ -75,7 +72,7 @@ router.post('/direcciones', (req, res) => {
 });
 
 // Definimos la ruta PUT para actualizar registro en la tabla personas.
-router.put('/direcciones', (req, res) => {
+router.put('/detalle_reserva', (req, res) => {
 
     // Extraemos datos del body JSON que nos envía el cliente (Postman, frontend, etc.)
     // Usamos destructuring para sacar directamente las variables del objeto JSON.
@@ -101,7 +98,7 @@ router.put('/direcciones', (req, res) => {
     }
 
     // Nombre de la tabla en la base de datos
-    const tabla = 'direcciones';
+    const tabla = 'detalle_reserva';
 
     // Armamos el valor que queremos asignar en el UPDATE.
     // Si es número, lo dejamos sin comillas (ej: 25)
