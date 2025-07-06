@@ -16,27 +16,6 @@ const routerActividades = require('./routers/actividades');
 const routerArchivos = require('./routers/archivos');
 const routerBitacoras = require('./routers/bitacoras');
 const routerBackups = require('./routers/backups');
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con ./
-app.use(routerPersonas);
-app.use(routerActividades);
-app.use(routerArchivos);
-app.use(routerBitacoras);
-app.use(routerBackups);
-//Importa el archivo que cree llamado router.js
-//Este archivo contiene todas tus rutas definidas con Express.
 const routerPersona = require('./routers/personas');
 const routerParques = require('./routers/parques');
 const routerReservas = require('./routers/reservas');
@@ -57,7 +36,22 @@ const routerRecursos = require('./routers/recursos');
 
 
 
-//Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con /.
+
+
+
+
+
+
+
+
+
+
+//Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con ./
+app.use(routerPersonas);
+app.use(routerActividades);
+app.use(routerArchivos);
+app.use(routerBitacoras);
+app.use(routerBackups);
 app.use(routerPersona);
 app.use(routerParques);
 app.use(routerReservas);
