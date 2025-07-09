@@ -33,18 +33,11 @@ const routerUsuarios = require('./routers/usuarios');
 const routerUsuariosRoles = require('./routers/usuarios_roles');
 const routerAlertas = require('./routers/alertas');
 const routerRecursos = require('./routers/recursos');
-
-
-
-
-
-
-
-
-
-
-
-
+const routertipo_alertas = require('./routers/tipo_alertas');
+const routertipo_archivo = require('./routers/tipo_archivo');
+const routertipo_espacio = require('./routers/tipo_espacio');
+const routertipo_especies = require('./routers/tipo_especies');
+const routertipo_evento = require('./routers/tipo_evento');
 
 //Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con ./
 app.use(routerPersonas);
@@ -69,6 +62,11 @@ app.use(routerUsuarios);
 app.use(routerUsuariosRoles);
 app.use(routerAlertas);
 app.use(routerRecursos);
+app.use('/',routertipo_alertas )
+app.use('/',routertipo_archivo)
+app.use('/',routertipo_espacio)
+app.use('/',routertipo_especies)
+app.use('/',routertipo_evento)
 
 //Le dice a Express: Cada vez que recibas datos en JSON en el body de la petición, conviértelos automáticamente en un objeto de JavaScript para poder trabajarlos.
 app.use(express.json());
