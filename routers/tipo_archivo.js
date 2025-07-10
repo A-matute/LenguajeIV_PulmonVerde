@@ -2,28 +2,26 @@
 const express = require('express');
 
 // Creamos un router independiente de Express
-const router = express.Router();
+const routertipo_archivo = express.Router();
 
-// Importamos la conexión a la base de datos (desde config/db-connection.js)
+// Importamos la conexión a la base de datos 
 const db = require('../config/db-connection');
 
-
-
-// Definimos una ruta GET para obtener todos los registros de las personas.
-router.get('/personas', (req, res) => {
+// Definimos una ruta GET para obtener todos los registros de os archivos.
+routertipo_archivo.get('/tipo_archivo', (req, res) => {
     // Definimos las columnas que queremos traer de la tabla.
     // Estas columnas se usarán en el SELECT dinámico del procedimiento almacenado.
-    const columnas = 'cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad';
+    const columnas = 'cod_tipo_archivo, nombre';
 
     // Definimos el nombre de la tabla.
-    const tabla = 'personas';
+    const tabla = 'tipo_archivo';
 
     // Llamamos al procedimiento almacenado PA_SELECT en MySQL.
     // IMPORTANTE: El orden de los parámetros es:
     //   1. nombre de la tabla
     //   2. lista de columnas
     //
-    // Si los envío al revés, MySQL tratará las columnas como nombre de tabla y fallará.
+    // Si los envías al revés, MySQL tratará las columnas como nombre de tabla y fallará.
     db.query('CALL PA_SELECT(?, ?)', [tabla, columnas], (err, results) => {
         if (err) {
             // Si ocurre un error en el SP, lo mostramos en consola
@@ -42,26 +40,21 @@ router.get('/personas', (req, res) => {
 });
 
 
-// Ruta POST para insertar una nueva persona.
-router.post('/personas', (req, res) => {
-    // Extraer cod_persona y los demás campos del body
+// Ruta POST para insertar un nuevo tipo_archivo.
+routertipo_archivo.post('/tipo_archivo', (req, res) => {
+    // Extraer los campos del body
     const {
-        cod_persona,
-        DNI,
-        nombre,
-        apellido,
-        fecha_nacimiento,
-        genero,
-        nacionalidad
+        cod_tipo_archivo,
+        nombre
     } = req.body;
 
-    const tabla = 'personas';
+    const tabla = 'tipo_archivo';
 
     // Armamos la lista de columnas
-    const columnas = 'cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad';
+    const columnas = 'cod_tipo_archivo, nombre';
 
-    // Armamos los valores, con cod_persona sin comillas (porque es número)
-    const datos = `${cod_persona}, '${DNI}', '${nombre}', '${apellido}', '${fecha_nacimiento}', '${genero}', '${nacionalidad}'`;
+    // Armamos los valores, con cod_tipo_archivo sin comillas (porque es número)
+    const datos = `${cod_tipo_archivo}, '${nombre}'`;
 
     // Llamamos al procedimiento almacenado
     db.query('CALL PA_INSERT(?, ?, ?)', [tabla, columnas, datos], (err, results) => {
@@ -80,8 +73,8 @@ router.post('/personas', (req, res) => {
 });
 
 
-// Definimos la ruta PUT para actualizar registro en la tabla personas.
-router.put('/personas', (req, res) => {
+// Definimos la ruta PUT para actualizar registro en la tabla tipo_archivo.
+routertipo_archivo.put('/tipo_archivo', (req, res) => {
 
     // Extraemos datos del body JSON que nos envía el cliente (Postman, frontend, etc.)
     // Usamos destructuring para sacar directamente las variables del objeto JSON.
@@ -102,12 +95,12 @@ router.put('/personas', (req, res) => {
     ) {
         return res.status(400).json({
             error: true,
-            respuesta: 'Faltan campos obligatorios en el JSON enviado.'
+            message: 'Faltan campos obligatorios en el JSON enviado.'
         });
     }
 
     // Nombre de la tabla en la base de datos
-    const tabla = 'personas';
+    const tabla = 'tipo_archivo';
 
     // Armamos el valor que queremos asignar en el UPDATE.
     // Si es número, lo dejamos sin comillas (ej: 25)
@@ -142,7 +135,7 @@ router.put('/personas', (req, res) => {
             if (err) {
                 // Si ocurre un error en la ejecución del procedimiento almacenado,
                 // lo mostramos en consola y devolvemos un error 500 al cliente.
-                console.error('Error en el procedimiento almacenado UPDATE:', err.sqlMessage || err.message || err);
+                console.error('❌ Error en el procedimiento almacenado UPDATE:', err.sqlMessage || err.message || err);
                 res.status(500).json({
                     error: true,
                     respuesta: err.sqlMessage || err.message
@@ -150,7 +143,7 @@ router.put('/personas', (req, res) => {
             } else {
                 // Si todo salió bien, devolvemos un mensaje de éxito.
                 res.status(200).json({
-                    respuesta: 'Registro actualizado correctamente en sistema.'
+                    respuesta: 'Registro actualizado correctamente.'
                 });
             }
         }
@@ -159,4 +152,4 @@ router.put('/personas', (req, res) => {
 
 
 // Exportamos el router para que pueda ser utilizado en index.js
-module.exports = router;
+module.exports = routertipo_archivo;

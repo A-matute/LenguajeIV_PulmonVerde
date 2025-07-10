@@ -1,29 +1,27 @@
-// Importamos Express
 const express = require('express');
 
 // Creamos un router independiente de Express
 const router = express.Router();
 
-// Importamos la conexión a la base de datos (desde config/db-connection.js)
+// Importamos la conexión a la base de datos (desde models/personas-model.js)
 const db = require('../config/db-connection');
 
-
-
-// Definimos una ruta GET para obtener todos los registros de las personas.
-router.get('/personas', (req, res) => {
+// Definimos una ruta GET para obtener todos los registros de alertas.
+router.get('/alertas', (req, res) => {
     // Definimos las columnas que queremos traer de la tabla.
     // Estas columnas se usarán en el SELECT dinámico del procedimiento almacenado.
-    const columnas = 'cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad';
+    const columnas = 'cod_alerta, fecha_hora_alerta, descripcion_alerta, cod_parque, cod_evento, cod_tipo_alerta';
+
 
     // Definimos el nombre de la tabla.
-    const tabla = 'personas';
+    const tabla = 'alertas';
 
     // Llamamos al procedimiento almacenado PA_SELECT en MySQL.
     // IMPORTANTE: El orden de los parámetros es:
     //   1. nombre de la tabla
     //   2. lista de columnas
     //
-    // Si los envío al revés, MySQL tratará las columnas como nombre de tabla y fallará.
+    // Si los envías al revés, MySQL tratará las columnas como nombre de tabla y fallará.
     db.query('CALL PA_SELECT(?, ?)', [tabla, columnas], (err, results) => {
         if (err) {
             // Si ocurre un error en el SP, lo mostramos en consola
@@ -40,28 +38,26 @@ router.get('/personas', (req, res) => {
         }
     });
 });
-
-
-// Ruta POST para insertar una nueva persona.
-router.post('/personas', (req, res) => {
-    // Extraer cod_persona y los demás campos del body
+//------------------------------------------------------------------------------------
+// Ruta POST para insertar una nueva alerta.
+router.post('/alertas', (req, res) => {
+    // Extraer cod_usuario y los demás campos del body
     const {
-        cod_persona,
-        DNI,
-        nombre,
-        apellido,
-        fecha_nacimiento,
-        genero,
-        nacionalidad
+        cod_alerta,
+        fecha_hora_alerta,
+        descripcion_alerta,
+        cod_parque,
+        cod_evento,
+        cod_tipo_alerta
     } = req.body;
 
-    const tabla = 'personas';
+    const tabla = 'alertas';
 
     // Armamos la lista de columnas
-    const columnas = 'cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad';
+    const columnas = 'cod_alerta, fecha_hora_alerta, descripcion_alerta, cod_parque, cod_evento, cod_tipo_alerta';
 
-    // Armamos los valores, con cod_persona sin comillas (porque es número)
-    const datos = `${cod_persona}, '${DNI}', '${nombre}', '${apellido}', '${fecha_nacimiento}', '${genero}', '${nacionalidad}'`;
+    // Armamos los valores, con cod_alerta sin comillas (porque es número)
+    const datos = `${cod_alerta}, '${fecha_hora_alerta}', '${descripcion_alerta}', ${cod_parque}, ${cod_evento}, ${cod_tipo_alerta}`;
 
     // Llamamos al procedimiento almacenado
     db.query('CALL PA_INSERT(?, ?, ?)', [tabla, columnas, datos], (err, results) => {
@@ -78,10 +74,9 @@ router.post('/personas', (req, res) => {
         }
     });
 });
-
-
-// Definimos la ruta PUT para actualizar registro en la tabla personas.
-router.put('/personas', (req, res) => {
+// -----------------------------------------------------------------------------------
+//Ruta PUT para actualizar un campo de usuario
+router.put('/alertas', (req, res) => {
 
     // Extraemos datos del body JSON que nos envía el cliente (Postman, frontend, etc.)
     // Usamos destructuring para sacar directamente las variables del objeto JSON.
@@ -102,12 +97,12 @@ router.put('/personas', (req, res) => {
     ) {
         return res.status(400).json({
             error: true,
-            respuesta: 'Faltan campos obligatorios en el JSON enviado.'
+            message: 'Faltan campos obligatorios en el JSON enviado.'
         });
     }
 
     // Nombre de la tabla en la base de datos
-    const tabla = 'personas';
+    const tabla = 'alertas';
 
     // Armamos el valor que queremos asignar en el UPDATE.
     // Si es número, lo dejamos sin comillas (ej: 25)
@@ -150,13 +145,11 @@ router.put('/personas', (req, res) => {
             } else {
                 // Si todo salió bien, devolvemos un mensaje de éxito.
                 res.status(200).json({
-                    respuesta: 'Registro actualizado correctamente en sistema.'
+                    respuesta: 'Registro actualizado correctamente.'
                 });
             }
         }
     );
 });
-
-
-// Exportamos el router para que pueda ser utilizado en index.js
+//Exportamos router para que pueda ser utilizado en index.js
 module.exports = router;

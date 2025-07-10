@@ -4,26 +4,24 @@ const express = require('express');
 // Creamos un router independiente de Express
 const router = express.Router();
 
-// Importamos la conexión a la base de datos (desde config/db-connection.js)
+// Importamos la conexión a la base de datos (desde models/mantenimientos-model.js)
 const db = require('../config/db-connection');
 
-
-
-// Definimos una ruta GET para obtener todos los registros de las personas.
-router.get('/personas', (req, res) => {
+// Definimos una ruta GET para obtener todos los registros de los mantenimientos.
+router.get('/mantenimientos', (req, res) => {
     // Definimos las columnas que queremos traer de la tabla.
     // Estas columnas se usarán en el SELECT dinámico del procedimiento almacenado.
-    const columnas = 'cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad';
+    const columnas = 'cod_mantenimiento, fecha_mantenimiento, descripcion, cod_recurso, cod_empleado';
 
     // Definimos el nombre de la tabla.
-    const tabla = 'personas';
+    const tabla = 'mantenimientos';
 
     // Llamamos al procedimiento almacenado PA_SELECT en MySQL.
     // IMPORTANTE: El orden de los parámetros es:
     //   1. nombre de la tabla
     //   2. lista de columnas
     //
-    // Si los envío al revés, MySQL tratará las columnas como nombre de tabla y fallará.
+    // Si los envías al revés, MySQL tratará las columnas como nombre de tabla y fallará.
     db.query('CALL PA_SELECT(?, ?)', [tabla, columnas], (err, results) => {
         if (err) {
             // Si ocurre un error en el SP, lo mostramos en consola
@@ -42,26 +40,28 @@ router.get('/personas', (req, res) => {
 });
 
 
-// Ruta POST para insertar una nueva persona.
-router.post('/personas', (req, res) => {
-    // Extraer cod_persona y los demás campos del body
+// Ruta POST para insertar un nuevo mantenimientos.
+router.post('/mantenimientos', (req, res) => {
+    // Extraer cod_mantenimiento y los demás campos del body
     const {
-        cod_persona,
-        DNI,
-        nombre,
-        apellido,
-        fecha_nacimiento,
-        genero,
-        nacionalidad
+        cod_mantenimiento,
+        fecha_mantenimiento,
+        descripcion,
+        cod_recurso,
+        cod_empleado
     } = req.body;
 
-    const tabla = 'personas';
+    // Agregar console.log para depuración y verificar los datos que llegan
+    console.log(req.body); // Verifica qué datos están llegando al backend
+
+    const tabla = 'mantenimientos';
 
     // Armamos la lista de columnas
-    const columnas = 'cod_persona, DNI, nombre, apellido, fecha_nacimiento, genero, nacionalidad';
+    const columnas = 'cod_mantenimiento, fecha_mantenimiento, descripcion, cod_recurso, cod_empleado';
 
-    // Armamos los valores, con cod_persona sin comillas (porque es número)
-    const datos = `${cod_persona}, '${DNI}', '${nombre}', '${apellido}', '${fecha_nacimiento}', '${genero}', '${nacionalidad}'`;
+
+    // Armamos los valores, con cod_mantenimiento sin comillas (porque es número)
+    const datos = `${cod_mantenimiento}, '${fecha_mantenimiento}', '${descripcion}', ${cod_recurso}, ${cod_empleado}`;
 
     // Llamamos al procedimiento almacenado
     db.query('CALL PA_INSERT(?, ?, ?)', [tabla, columnas, datos], (err, results) => {
@@ -79,9 +79,8 @@ router.post('/personas', (req, res) => {
     });
 });
 
-
-// Definimos la ruta PUT para actualizar registro en la tabla personas.
-router.put('/personas', (req, res) => {
+// Definimos la ruta PUT para actualizar registro en la tabla mantenimientos.
+router.put('/mantenimientos', (req, res) => {
 
     // Extraemos datos del body JSON que nos envía el cliente (Postman, frontend, etc.)
     // Usamos destructuring para sacar directamente las variables del objeto JSON.
@@ -102,12 +101,12 @@ router.put('/personas', (req, res) => {
     ) {
         return res.status(400).json({
             error: true,
-            respuesta: 'Faltan campos obligatorios en el JSON enviado.'
+            message: 'Faltan campos obligatorios en el JSON enviado.'
         });
     }
 
     // Nombre de la tabla en la base de datos
-    const tabla = 'personas';
+    const tabla = 'mantenimientos';
 
     // Armamos el valor que queremos asignar en el UPDATE.
     // Si es número, lo dejamos sin comillas (ej: 25)
@@ -130,10 +129,10 @@ router.put('/personas', (req, res) => {
 
     // Llamamos al procedimiento almacenado PA_UPDATE en MySQL.
     // Le enviamos los parámetros necesarios:
-    // - tabla: nombre de la tabla (e.g. 'personas')
+    // - tabla: nombre de la tabla (e.g. 'empleados')
     // - dato_actualizar: columna que queremos modificar (e.g. 'nombre')
     // - nuevoDato: nuevo valor (e.g. 'Alex')
-    // - condicion: campo por el cual filtrar (e.g. 'cod_persona')
+    // - condicion: campo por el cual filtrar (e.g. 'empleados')
     // - '= valorCondicion': condición de igualdad (e.g. '= 110')
     db.query(
         'CALL PA_UPDATE(?, ?, ?, ?, ?)',
@@ -142,7 +141,7 @@ router.put('/personas', (req, res) => {
             if (err) {
                 // Si ocurre un error en la ejecución del procedimiento almacenado,
                 // lo mostramos en consola y devolvemos un error 500 al cliente.
-                console.error('Error en el procedimiento almacenado UPDATE:', err.sqlMessage || err.message || err);
+                console.error('❌ Error en el procedimiento almacenado UPDATE:', err.sqlMessage || err.message || err);
                 res.status(500).json({
                     error: true,
                     respuesta: err.sqlMessage || err.message
@@ -150,7 +149,7 @@ router.put('/personas', (req, res) => {
             } else {
                 // Si todo salió bien, devolvemos un mensaje de éxito.
                 res.status(200).json({
-                    respuesta: 'Registro actualizado correctamente en sistema.'
+                    respuesta: 'Registro actualizado correctamente.'
                 });
             }
         }
