@@ -6,6 +6,9 @@ const express = require('express');
 var app = express();
 //Constante para el paquete  de body-paser
 const bp = require('body-parser');
+
+const cors = require('cors');
+app.use(cors());
 //Enviando los datos JSON a NodeJS API
 app.use(bp.json());
 
@@ -44,6 +47,8 @@ const routerCorreos = require('./routers/correos');
 const routerDetalle_Reserva = require('./routers/detalle_reserva');
 const routerDirecciones = require('./routers/direcciones');
 const routerCatalogo_Especies = require('./routers/catalogo_especies');
+
+
 
 
 //Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con ./

@@ -10,7 +10,7 @@ const db = require('../config/db-connection');
 
 router.get('/actividades', (req, res) => {
     // Definimos las columnas que queremos traer de la tabla actividades
-    const columnas = 'cod_actividad, nombre_actividad, cantidad_personas, estado, cod_espacio';
+    const columnas = 'cod_actividad, nombre_actividad, descripcion, cantidad_personas, estado, cod_espacio';
 
     // Definimos el nombre de la tabla
     const tabla = 'actividades';
@@ -67,6 +67,8 @@ router.post('/actividades', (req, res) => {
         }
     });
 });
+
+
 
 
 router.put('/actividades', (req, res) => {
