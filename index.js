@@ -47,8 +47,7 @@ const routerCorreos = require('./routers/correos');
 const routerDetalle_Reserva = require('./routers/detalle_reserva');
 const routerDirecciones = require('./routers/direcciones');
 const routerCatalogo_Especies = require('./routers/catalogo_especies');
-
-
+const routerlogin = require('./routers/login');
 
 
 //Le dice a express: Usa las rutas definidas en router cada vez que la URL empiece con ./
@@ -84,6 +83,7 @@ app.use(routerCorreos);
 app.use(routerDetalle_Reserva);
 app.use(routerDirecciones);
 app.use(routerCatalogo_Especies);
+app.use(routerlogin);
 
 
 
