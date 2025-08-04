@@ -30,6 +30,31 @@ router.get('/backups', (req, res) => {
     });
 });
 
+// Endpoint para obtener un solo backup por su código
+router.get('/backups/:cod_backup', (req, res) => {
+    const codBackup = req.params.cod_backup; // Capturamos el código del backup desde la URL
+
+    // Definimos la consulta SQL para obtener un registro específico
+    const query = 'SELECT cod_backup, fecha_backup, ruta_archivo, tipo_backup, cod_usuario FROM backups WHERE cod_backup = ?';
+
+    db.query(query, [codBackup], (err, results) => {
+        if (err) {
+            console.error('Error al obtener el registro:', err.sqlMessage || err.message || err);
+            res.status(500).json({
+                error: true,
+                respuesta: err.sqlMessage || err.message
+            });
+        } else if (results.length === 0) {
+            res.status(404).json({
+                error: true,
+                respuesta: 'Registro no encontrado.'
+            });
+        } else {
+            res.status(200).json(results[0]); // Devuelve el primer (y único) resultado
+        }
+    });
+});
+
 
 router.post('/backups', (req, res) => {
     // Extraer los campos del body de la petición
