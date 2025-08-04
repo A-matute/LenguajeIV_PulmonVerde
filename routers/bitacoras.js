@@ -30,6 +30,25 @@ router.get('/bitacoras', (req, res) => {
     });
 });
 
+// Endpoint para obtener todos los registros de la tabla 'bitacoras'
+router.get('/bitacoras', (req, res) => {
+    // La consulta SQL selecciona las columnas de tu base de datos y las ordena por fecha_hora
+    const query = 'SELECT cod_bitacora, accion, tabla_afectada, fecha_hora FROM bitacoras ORDER BY fecha_hora DESC';
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error al obtener los logs de bitácora:', err.sqlMessage || err.message || err);
+            res.status(500).json({
+                error: true,
+                respuesta: err.sqlMessage || err.message
+            });
+        } else {
+            // Devolvemos los resultados completos
+            res.status(200).json(results);
+        }
+    });
+});
+
 
 router.post('/bitacoras', (req, res) => {
     // Extraer los campos del body de la petición
