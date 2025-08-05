@@ -55,8 +55,9 @@ router.get('/parques/:cod_parque', (req, res) => {
 // =======================================
 // POST - INSERTAR NUEVO PARQUE
 // =======================================
-// ANA R. CABRERA - Se ha modificado para generar el cod_parque manualmente,
-// ya que la columna no está configurada como AUTO_INCREMENT.
+// ANA R. CABRERA - Se ha modificado para generar el cod_parque manualmente y
+// usar una consulta de inserción directa y segura, ya que el procedimiento almacenado
+// PA_INSERT presentaba un alto riesgo de errores y vulnerabilidades.
 router.post('/parques', (req, res) => {
     const {
         nombre_parque,
@@ -75,7 +76,7 @@ router.post('/parques', (req, res) => {
             console.error('Error al obtener el código máximo del parque:', err.sqlMessage || err.message || err);
             return res.status(500).json({
                 error: true,
-                respuesta: err.sqlMessage || err.message
+                respuesta: 'Error interno del servidor al obtener el código máximo.'
             });
         }
 
@@ -85,23 +86,23 @@ router.post('/parques', (req, res) => {
             nuevo_cod = result[0].max_cod + 1;
         }
 
-        const tabla = 'parques';
-        const columnas = 'cod_parque, nombre_parque, ubicacion_parque, fecha_inauguracion, estado';
-        
-        // Creamos la lista de valores con el nuevo código
-        const valores = `${nuevo_cod}, "${nombre_parque}", "${ubicacion_parque}", "${fecha_inauguracion}", "${estado}"`;
+        // Usamos una consulta INSERT directa y segura con placeholders
+        const sql = `
+            INSERT INTO parques (cod_parque, nombre_parque, ubicacion_parque, fecha_inauguracion, estado)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const values = [nuevo_cod, nombre_parque, ubicacion_parque, fecha_inauguracion, estado];
 
-        // Llamamos al procedimiento almacenado PA_INSERT con los datos completos
-        db.query('CALL PA_INSERT(?, ?, ?)', [tabla, columnas, valores], (err, results) => {
+        db.query(sql, values, (err, results) => {
             if (err) {
                 console.error('Error al insertar el parque:', err.sqlMessage || err.message || err);
-                res.status(500).json({
+                return res.status(500).json({
                     error: true,
-                    respuesta: err.sqlMessage || err.message
+                    respuesta: 'Error interno del servidor al insertar el parque.'
                 });
             } else {
                 res.status(201).json({
-                    respuesta: 'Parque insertado correctamente en la base de datos.'
+                    respuesta: `Parque con código ${nuevo_cod} insertado correctamente en la base de datos.`
                 });
             }
         });
@@ -132,7 +133,7 @@ router.put('/parques/:cod_parque', (req, res) => {
     // Usamos una consulta UPDATE segura con placeholders para actualizar múltiples campos
     const sql = `UPDATE parques SET nombre_parque = ?, ubicacion_parque = ?, fecha_inauguracion = ?, estado = ? WHERE cod_parque = ?`;
     const values = [nombre_parque, ubicacion_parque, fecha_inauguracion, estado, cod_parque];
-    
+
     db.query(sql, values, (err, results) => {
         if (err) {
             console.error('Error al actualizar el parque:', err.sqlMessage || err.message || err);
