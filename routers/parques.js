@@ -1,9 +1,22 @@
-// Importamos Express
+// Importamos Express y Multer
 const express = require('express');
-// Creamos un router independiente de Express
 const router = express.Router();
-// Importamos la conexión a la base de datos
 const db = require('../config/db-connection');
+const multer = require('multer');
+
+// Ana R. Cabrera: Configuración de Multer para guardar archivos
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // La carpeta donde se guardarán los archivos. Debe existir.
+        cb(null, './uploads'); 
+    },
+    filename: (req, file, cb) => {
+        // Generamos un nombre único para el archivo para evitar conflictos
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
 
 // =======================================
 // GET - OBTENER TODOS LOS PARQUES
@@ -55,9 +68,6 @@ router.get('/parques/:cod_parque', (req, res) => {
 // =======================================
 // POST - INSERTAR NUEVO PARQUE
 // =======================================
-// ANA R. CABRERA - Se ha modificado para generar el cod_parque manualmente y
-// usar una consulta de inserción directa y segura, ya que el procedimiento almacenado
-// PA_INSERT presentaba un alto riesgo de errores y vulnerabilidades.
 router.post('/parques', (req, res) => {
     const {
         nombre_parque,
@@ -112,8 +122,6 @@ router.post('/parques', (req, res) => {
 // =======================================
 // PUT - ACTUALIZAR UN PARQUE
 // =======================================
-// ANA R. CABRERA - Se ha modificado para usar una consulta SQL directa,
-// ya que el procedimiento almacenado PA_UPDATE no coincidía con los requisitos de la aplicación.
 router.put('/parques/:cod_parque', (req, res) => {
     const { cod_parque } = req.params;
     const {
@@ -130,7 +138,6 @@ router.put('/parques/:cod_parque', (req, res) => {
         });
     }
 
-    // Usamos una consulta UPDATE segura con placeholders para actualizar múltiples campos
     const sql = `UPDATE parques SET nombre_parque = ?, ubicacion_parque = ?, fecha_inauguracion = ?, estado = ? WHERE cod_parque = ?`;
     const values = [nombre_parque, ubicacion_parque, fecha_inauguracion, estado, cod_parque];
 
@@ -152,7 +159,6 @@ router.put('/parques/:cod_parque', (req, res) => {
 // =======================================
 // DELETE - ELIMINAR UN PARQUE
 // =======================================
-// ANA R. CABRERA - Nueva ruta para eliminar un parque por su código.
 router.delete('/parques/:cod_parque', (req, res) => {
     const { cod_parque } = req.params;
     const sql = `DELETE FROM parques WHERE cod_parque = ?`;
@@ -166,13 +172,11 @@ router.delete('/parques/:cod_parque', (req, res) => {
             });
         }
         
-        // Verificamos si se eliminó alguna fila
         if (results.affectedRows > 0) {
             res.status(200).json({
                 respuesta: 'Parque eliminado correctamente.'
             });
         } else {
-            // Si no se eliminó ninguna fila, el parque no fue encontrado
             res.status(404).json({
                 error: true,
                 respuesta: 'El parque no fue encontrado.'
@@ -181,6 +185,37 @@ router.delete('/parques/:cod_parque', (req, res) => {
     });
 });
 
-// Exportamos el router para que pueda ser utilizado en index.js
+// ====================================================================
+// POST - SUBIR ARCHIVOS (IMÁGENES, PDF, MAPAS) PARA UN PARQUE
+// ====================================================================
+// ANA R. CABRERA - Endpoint para subir archivos y guardarlos en la tabla 'archivos'
+router.post('/parques/:cod_parque/archivos', upload.single('documento'), (req, res) => {
+    const { cod_parque } = req.params;
+    const { descripcion } = req.body;
+    const nombre_archivo = req.file ? req.file.filename : null;
+
+    if (!nombre_archivo || !descripcion || !cod_parque) {
+        return res.status(400).json({ error: true, respuesta: 'Faltan campos obligatorios: archivo, descripcion o codigo de parque.' });
+    }
+
+    const sql = `
+        INSERT INTO archivos (cod_parque, nombre_archivo, descripcion, fecha_subida)
+        VALUES (?, ?, ?, NOW());
+    `;
+
+    db.query(sql, [cod_parque, nombre_archivo, descripcion], (err, results) => {
+        if (err) {
+            console.error('Error al insertar archivo:', err.sqlMessage || err.message || err);
+            return res.status(500).json({
+                error: true,
+                respuesta: 'Error interno del servidor al insertar el archivo.'
+            });
+        }
+        res.status(201).json({
+            respuesta: `Archivo subido y registrado correctamente.`
+        });
+    });
+});
+
 module.exports = router;
 
