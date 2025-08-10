@@ -149,6 +149,37 @@ router.put('/parques/:cod_parque', (req, res) => {
     });
 });
 
+// =======================================
+// DELETE - ELIMINAR UN PARQUE
+// =======================================
+// ANA R. CABRERA - Nueva ruta para eliminar un parque por su código.
+router.delete('/parques/:cod_parque', (req, res) => {
+    const { cod_parque } = req.params;
+    const sql = `DELETE FROM parques WHERE cod_parque = ?`;
+
+    db.query(sql, [cod_parque], (err, results) => {
+        if (err) {
+            console.error('Error al eliminar el parque:', err.sqlMessage || err.message || err);
+            return res.status(500).json({
+                error: true,
+                respuesta: 'Error interno del servidor al eliminar el parque.'
+            });
+        }
+        
+        // Verificamos si se eliminó alguna fila
+        if (results.affectedRows > 0) {
+            res.status(200).json({
+                respuesta: 'Parque eliminado correctamente.'
+            });
+        } else {
+            // Si no se eliminó ninguna fila, el parque no fue encontrado
+            res.status(404).json({
+                error: true,
+                respuesta: 'El parque no fue encontrado.'
+            });
+        }
+    });
+});
 
 // Exportamos el router para que pueda ser utilizado en index.js
 module.exports = router;
