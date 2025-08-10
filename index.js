@@ -2,6 +2,10 @@
 const mysql = require('mysql');
 //constante para el paquete de Express
 const express = require('express');
+
+//CONST PARA VALIDAD EL ESATDO DE LA BASE DE DATOS EN PANEL DE CONFIGURACION
+const db = require('./config/db-connection');
+
 //Variable para los metodos de express
 var app = express();
 //Constante para el paquete  de body-paser
@@ -12,6 +16,18 @@ app.use(cors());
 //Enviando los datos JSON a NodeJS API
 app.use(bp.json());
 
+// Endpoint para verificar el estado de la base de datos
+app.get('/status', (req, res) => {
+    // Hacemos una consulta simple para probar la conexión
+    db.query('SELECT 1 + 1 AS solution', (err, results) => {
+        if (err) {
+            console.error('Error al verificar la conexión a la base de datos:', err);
+            res.status(500).json({ status: 'error', message: 'Conexión fallida' });
+        } else {
+            res.status(200).json({ status: 'ok', message: 'Conexión exitosa' });
+        }
+    });
+});
 
 //Importa los archivos que cree llamado router.js
 //Estos archivos contienen todas las rutas definidas con Express.
