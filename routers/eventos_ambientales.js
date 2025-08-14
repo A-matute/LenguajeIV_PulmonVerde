@@ -16,7 +16,7 @@ router.get('/eventos_ambientales', (req, res) => {
     db.query('CALL PA_ObtenerEventosDetallados()', (err, results) => {
         if (err) {
             // Si ocurre un error, lo mostramos y respondemos con error 500.
-            console.error('❌ Error al ejecutar el procedimiento almacenado:', err.sqlMessage || err.message || err);
+            console.error(' Error al ejecutar el procedimiento almacenado:', err.sqlMessage || err.message || err);
             res.status(500).json({
                 error: true,
                 respuesta: err.sqlMessage || err.message
@@ -52,9 +52,6 @@ router.post('/eventos_ambientales', (req, res) => {
     // Aseguramos que sea un número para la inserción directa.
     const finalCodEspecie = (cod_especie === null || cod_especie === '') ? 0 : parseInt(cod_especie);
 
-    // *** INICIO DE LA SOLUCIÓN: INSERTAMOS DIRECTAMENTE SIN PA_INSERT ***
-    // Construimos la consulta INSERT directamente con placeholders (?).
-    // El driver de MySQL (mysql2) se encargará de escapar y formatear los valores correctamente.
     const sql = `
         INSERT INTO eventos_ambientales (
             cod_evento, 
@@ -83,7 +80,6 @@ router.post('/eventos_ambientales', (req, res) => {
     db.query(sql, values, (err, results) => {
         if (err) {
             console.error('Error al insertar directamente en la base de datos:', err.sqlMessage || err.message || err);
-            // Revisa si es un error de clave duplicada para dar un mensaje más específico.
             if (err.code === 'ER_DUP_ENTRY') {
                  res.status(409).json({ // 409 Conflict es apropiado para entradas duplicadas
                     error: true,
